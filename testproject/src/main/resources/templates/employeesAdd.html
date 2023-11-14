@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{'https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css'}"
+          integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+    <title>Add Employee</title>
+</head>
+
+<body>
+
+<div class="container-fluid" th:insert="~{navbar1}"></div>
+
+<div class="container-fluid">
+    <div class="row mt-5" >
+        <div class="col-6 offset-3">
+            <form th:action="@{'/employees/add'}" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label th:text="#{main.number}"></label>
+                    <input type="number" class="form-control" name="personal_number">
+                </div>
+                <div class="form-group">
+                    <label th:text="#{main.secondName}"></label>
+                    <input type="text" class="form-control" name="second_name">
+                </div>
+                <div class="form-group">
+                    <label th:text="#{main.firstName}"></label>
+                    <input type="text" class="form-control" name="first_name">
+                </div>
+                <div class="form-group">
+                    <label th:text="#{main.thirdName}"></label>
+                    <input type="text" class="form-control" name="third_name">
+                </div>
+                <div class="form-group">
+                    <label th:text="#{main.picture}"></label>
+                    <input type="file" name="fileImage">
+                </div>
+                <div class="form-group">
+                    <label th:text="#{main.dateOfBirth}"></label>
+                    <input type="date" class="form-control" name="date_of_birth">
+                </div>
+                <div class="form-group">
+                    <label th:text="#{main.position}"></label>
+                    <select class="form-control" name="position">
+                        <option th:each="pos:${positions}" th:text="${pos.positionName}" th:value="${pos.id}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label th:text="#{main.rank}"></label>
+                    <select class="form-control" name="rank">
+                        <option th:each="rank: ${ranks}" th:text="${rank.rankName}" th:value="${rank.id}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label th:text="#{main.department}"></label>
+                    <select class="form-control" name="department">
+                        <option th:each="dep:${departments}" th:text="${dep.departmentName}" th:value="${dep.id}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label th:text="#{main.dateOfSign}"></label>
+                    <input type="date" class="form-control" name="date_of_sign">
+                </div>
+                <div class="form-group">
+                    <label th:text="#{main.contractPeriod}"></label>
+                    <input type="number" class="form-control" name="contract_period">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-success" th:text="#{button.add}"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

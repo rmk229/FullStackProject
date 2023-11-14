@@ -1,0 +1,59 @@
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(64,107,204,0.83)" >
+    <a class="navbar-brand" th:href="@{'/'}">Test project</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{'/'}" th:text="#{label.home}"></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{'/employees/about'}" th:text="#{label.about}"></a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:text="#{main.structure}">
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" th:href="@{'/positions'}" th:text="#{main.position}"></a>
+                    <a class="dropdown-item" th:href="@{'/ranks'}" th:text="#{main.rank}"></a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" th:href="@{'/departments'}" th:text="#{main.department}"></a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="?lng=ru">RU</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="?lng=en">EN</a>
+            </li>
+        </ul>
+<!--        <form id="search-form" class="form-inline my-2 my-lg-0">-->
+<!--            <input id="search-input" class="form-control mr-sm-2" type="search" th:placeholder="#{label.search}">-->
+<!--            <button class="btn btn-outline-light my-2 my-sm-0" type="submit" th:text="#{label.search}"></button>-->
+<!--        </form>-->
+        <form class="form-inline my-2 my-lg-0" action="/employees/search" method="GET">
+            <input class="form-control mr-sm-2" type="search" name="query" th:placeholder="#{label.search}">
+            <button class="btn btn-outline-light my-2 my-sm-0" type="submit" th:text="#{label.search}"></button>
+        </form>
+    </div>
+</nav>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var searchForm = document.getElementById("search-form");
+        var searchInput = document.getElementById("search-input");
+
+        searchForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+            var searchTerm = searchInput.value;
+            if (searchTerm) {
+                // Выполнить переход на страницу с поиском, если поисковый запрос не пустой
+                window.location.href = "/search?query=" + encodeURIComponent(searchTerm);
+            }
+            // Выполните здесь необходимые действия по поиску, например, переход на страницу результатов поиска.
+            // Пример перехода на страницу с поиском: window.location.href = "/search?query=" + searchTerm;
+        });
+    });
+</script>

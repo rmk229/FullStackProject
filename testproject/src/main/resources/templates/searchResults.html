@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Results</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css'}"/>
+</head>
+<body class="container mt-4">
+
+<!-- Search form -->
+<form class="mb-4" th:method="POST" th:action="@{/employees/search}">
+    <div class="form-group">
+        <label for="query">Search:</label>
+        <input type="text" class="form-control" id="query" name="query"/>
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+<!-- Display search results -->
+<div th:if="${employees}">
+    <h2>Employee Results</h2>
+
+    <div th:if="${employees.isEmpty()}">
+        <span class="text-danger">Didn't find employee</span>
+    </div>
+
+    <div th:each="employee:${employees}" class="mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"
+                    th:text="${employee.getSecondName() + ' ' + employee.getFirstName() + ' ' + employee.getThirdName()}"></h5>
+                <p class="card-text" th:text="${employee.getDateOfBirth()}"></p>
+                <p class="card-text" th:text="${employee.getDateOfSign()}"></p>
+                <p class="card-text" th:text="${employee.getPersonalNumber()}"></p>
+
+                <div th:if="${employee.getFirstName() != null}">
+                    <div th:if="${employee.getSecondName() != null}">
+                        <div th:if="${employee.getThirdName() != null}">
+                            <span class="text-success">EMPLOYEE HAS BEEN FOUND</span>
+                        </div>
+
+                        <!--                        <div th:if="${employee.getFirstName() == null}">-->
+                        <!--                            <div th:if="${employee.getSecondName() == null}">-->
+                        <!--                                <div th:if="${employee.getThirdName() == null}">-->
+                        <!--                                    <span class="text-danger">Employee with this name does not exist</span>-->
+                        <!--                                </div>-->
+
+                        <!--                                <hr/>-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Display search results for positions -->
+<div th:if="${positions}">
+    <h2>Position Results</h2>
+
+    <div th:if="${positions.isEmpty()}">
+        <span class="text-danger">Didn't find position with this name</span>
+    </div>
+
+    <div th:each="position:${positions}" class="mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title" th:text="${position.getPositionName()}"></h5>
+                <div th:if="${position.getPositionName() != null}">
+                    <span class="text-success">POSITION NAME HAS BEEN FOUND</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Display search results for departments -->
+<div th:if="${departments}">
+    <h2>Department Results</h2>
+
+    <div th:if="${departments.isEmpty()}">
+        <span class="text-danger">Didn't find department with this name</span>
+    </div>
+
+    <div th:each="department:${departments}" class="mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title" th:text="${department.getDepartmentName()}"></h5>
+                <div th:if="${department.getDepartmentName() != null}">
+                    <span class="text-success">DEPARTMENT NAME HAS BEEN FOUND</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Display search results for ranks -->
+<div th:if="${ranks}">
+    <h2>Ranks Results</h2>
+
+    <div th:if="${ranks.isEmpty()}">
+        <span class="text-danger">Didn't find rank with this name</span>
+    </div>
+
+    <div th:each="rank:${ranks}" class="mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title" th:text="${rank.getRankName()}"></h5>
+                <div th:if="${rank.getRankName() != null}">
+                    <span class="text-success">RANK NAME HAS BEEN FOUND</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script th:src="@{'https://code.jquery.com/jquery-3.3.1.slim.min.js'}"></script>
+<script th:src="@{'https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.bundle.min.js'}"></script>
+</body>
+</html>
