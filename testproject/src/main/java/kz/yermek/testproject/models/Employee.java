@@ -3,9 +3,7 @@ package kz.yermek.testproject.models;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Table(name = "employees")
@@ -15,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class Employee {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", length = 5)
@@ -31,9 +30,6 @@ public class Employee {
 
     @Column(name = "third_name", length = 30)
     private String thirdName;
-
-    @Column(name = "picture")
-    private String picture;
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
@@ -52,4 +48,8 @@ public class Employee {
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Department department;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Images images;
+
 }

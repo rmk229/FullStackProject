@@ -5,69 +5,71 @@ import kz.yermek.testproject.models.Rank;
 import kz.yermek.testproject.services.EmployeeService;
 import kz.yermek.testproject.services.RankService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/ranks")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class RankController {
+
     private final EmployeeService employeeService;
     private final RankService rankService;
 
     @GetMapping
-    public String getAllRanks(Model model) {
+    public ResponseEntity<List<Rank>> getAllRanks() {
         List<Rank> ranks = rankService.getRanks();
-        model.addAttribute("ranks", ranks);
-
-        return "ranks";
+        return new ResponseEntity<>(ranks, HttpStatus.OK);
     }
 
     @GetMapping("/add")
-    public String getForm() {
-        return "ranksAdd";
+    public ResponseEntity<Rank> getForm() {
+        return new ResponseEntity<>(HttpStatus.OK);
     }
-
     @PostMapping("/add")
-    public String addRank(@RequestParam(name = "rank_name") String rankName) {
-        if (rankName != null) {
-            Rank rank = new Rank();
-            rank.setRankName(rankName);
-            rankService.addRank(rank);
-        }
-        return "redirect:/ranks";
+    public ResponseEntity<Rank> createRank(@RequestBody Rank rank) throws URISyntaxException {
+        Rank savedRank = rankService.save(rank);
+        return ResponseEntity.created(new URI("/ranks/" +
+                savedRank.getId())).body(savedRank);
     }
 
     @GetMapping("/details/{id}")
-    public String details(Model model, @PathVariable(name = "id") int id) {
+    public ResponseEntity<Rank> details(@PathVariable int id) {
         Rank rank = rankService.getRank(id);
-        model.addAttribute("rank", rank);
-        return "ranksDetails";
+
+        if (rank != null) {
+            return new ResponseEntity<>(rank, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    @PostMapping("/details")
-    public String updateRank(@RequestParam(name = "id", defaultValue = "0") int id,
-                             @RequestParam(name = "rank") String rankName) {
+    @PostMapping("/details/{id}")
+    public ResponseEntity<Rank> updateRank(@RequestBody Rank newRank, @PathVariable int id) {
         Rank rank = rankService.getRank(id);
-        if (rank != null && rankName != null) {
-            rank.setRankName(rankName);
+        if (rank != null && newRank != null) {
+            rank.setRankName(newRank.getRankName());
             rankService.update(rank);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
 
-        return "redirect:/ranks";
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping(value = "/deleteRank")
-    public String deleteRank(@RequestParam(name = "id", defaultValue = "0") int id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Rank> deleteRank(@PathVariable int id) {
         Rank rank = rankService.getRank(id);
-
         List<Employee> employees = employeeService.getEmployees();
+
         for (Employee employee: employees) {
             if (employee.getRank().getId() == id) {
-                return "redirect:/ranks";
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         }
 
@@ -75,6 +77,6 @@ public class RankController {
             rankService.delete(rank);
         }
 
-        return "redirect:/ranks";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

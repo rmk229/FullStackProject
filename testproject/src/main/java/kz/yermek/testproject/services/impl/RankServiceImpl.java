@@ -40,6 +40,11 @@ public class RankServiceImpl implements RankService {
     }
 
     @Override
+    public Rank save(Rank rank) {
+        return rankRepository.save(rank);
+    }
+
+    @Override
     public List<Rank> searchRank(String query) {
         return rankRepository.findByRankNameEqualsIgnoreCase(query);
     }

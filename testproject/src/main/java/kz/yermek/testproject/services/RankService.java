@@ -11,5 +11,6 @@ public interface RankService {
     Rank update(Rank rank);
     Rank getRank(int id);
     void  delete(Rank rank);
+    Rank save(Rank rank);
     List<Rank> searchRank(String query);
 }

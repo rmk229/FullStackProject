@@ -12,5 +12,6 @@ public interface DepartmentService {
     Department update(Department department);
     Department getDepartment(int id);
     void delete(Department department);
+    Department save(Department department);
     List<Department> searchDepartment(String query);
 }

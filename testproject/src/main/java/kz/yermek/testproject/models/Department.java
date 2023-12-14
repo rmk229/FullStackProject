@@ -20,5 +20,8 @@ public class Department {
     @Column(name = "department_name", length = 30)
     private String departmentName;
 
+    public Department(int id) {
+        this.id = id;
+    }
 
 }

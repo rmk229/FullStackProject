@@ -19,4 +19,8 @@ public class Position {
 
     @Column(name = "position_name", length = 30)
     private String positionName;
+
+    public Position(int id) {
+        this.id = id;
+    }
 }

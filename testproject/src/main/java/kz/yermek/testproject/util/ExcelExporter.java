@@ -3,9 +3,7 @@ package kz.yermek.testproject.util;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import kz.yermek.testproject.models.Employee;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -28,8 +26,7 @@ public class ExcelExporter {
         workbook = new XSSFWorkbook();
     }
 
-
-    private void writeHeaderLine() {
+    public void writeHeaderLine() {
         sheet = workbook.createSheet("Сотрудники");
 
         Row row = sheet.createRow(0);
@@ -40,7 +37,7 @@ public class ExcelExporter {
         font.setFontHeight(16);
         style.setFont(font);
 
-        createCell(row, 0, "№ п/п", style);
+        createCell(row, 0, "Персональный номер", style);
         createCell(row, 1, "ФИО", style);
         createCell(row, 2, "Дата рождения", style);
         createCell(row, 3, "Должность", style);
@@ -49,20 +46,8 @@ public class ExcelExporter {
         createCell(row, 6, "Дата заключения контракта", style);
         createCell(row, 7, "Срок контракта (в годах)", style);
         createCell(row,8, "Дата завершения контракта", style);
-    }
 
-    private void createCell(Row row, int columnCount, Object value, CellStyle style) {
-        sheet.autoSizeColumn(columnCount);
-        Cell cell = row.createCell(columnCount);
 
-        if (value instanceof Integer) {
-            cell.setCellValue((Integer) value);
-        } else if (value instanceof Boolean) {
-            cell.setCellValue((Boolean) value);
-        } else {
-            cell.setCellValue((String) value);
-        }
-        cell.setCellStyle(style);
     }
 
     private void writeDataLines() {
@@ -77,10 +62,9 @@ public class ExcelExporter {
             Row row = sheet.createRow(rowCount++);
             int columnCount = 0;
 
-            //Корректное отобраэение даты в виде String, использованы
+            //Корректное отображение даты в виде String, использованы
             //1. Переход от LocalDate к виду Date
             //2. Переход от Date к String с использованием DateFormat
-
             Date dateOfBirthDate = null;
             if (employee.getDateOfBirth() != null) {
                 dateOfBirthDate = java.util.Date.from(employee.getDateOfBirth().atStartOfDay()
@@ -105,7 +89,7 @@ public class ExcelExporter {
                         .toInstant());
             }
 
-            //Наполнение строк данными конкретного сотрудника
+            //Заполнение строк, данными конкретного сотрудника
             createCell(row, columnCount++, employee.getPersonalNumber(), style);
             createCell(row, columnCount++, employee.getSecondName() + " " + employee.getFirstName() + " " + employee.getThirdName(), style);
             createCell(row, columnCount++, dateFormat.format(dateOfBirthDate), style);
@@ -116,6 +100,20 @@ public class ExcelExporter {
             createCell(row, columnCount++, employee.getContractPeriod(), style);
             createCell(row, columnCount++, dateFormat.format(dateEndContractDate), style);
         }
+    }
+
+    private void createCell(Row row, int columnCount, Object value, CellStyle style) {
+        sheet.autoSizeColumn(columnCount);
+        Cell cell = row.createCell(columnCount);
+
+        if (value instanceof Integer) {
+            cell.setCellValue((Integer) value);
+        } else if (value instanceof Boolean) {
+            cell.setCellValue((Boolean) value);
+        } else {
+            cell.setCellValue((String) value);
+        }
+        cell.setCellStyle(style);
     }
 
     public void export(HttpServletResponse response) throws IOException {

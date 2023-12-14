@@ -6,78 +6,72 @@ import kz.yermek.testproject.models.Employee;
 import kz.yermek.testproject.services.DepartmentService;
 import kz.yermek.testproject.services.EmployeeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/departments")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class DepartmentController {
 
     private final EmployeeService employeeService;
     private final DepartmentService departmentService;
 
     @GetMapping
-    public String getAllPositions(Model model) {
+    public ResponseEntity<List<Department>> getAllDepartments() {
         List<Department> departments = departmentService.getDepartments();
-        model.addAttribute("departments", departments);
-
-        return "departments";
-    }
-
-    @GetMapping("/add")
-    public String getForm() {
-        return "departmentsAdd";
+        return new ResponseEntity<>(departments, HttpStatus.OK);
     }
 
     @PostMapping("/add")
-    public String addPosition(@RequestParam(name = "department_name") String departmentName) {
-        if (departmentName != null) {
-            Department department = new Department();
-            department.setDepartmentName(departmentName);
-            departmentService.addDepartment(department);
-        }
-
-        return "redirect:/departments";
+    public ResponseEntity<Department> createDepartment(@RequestBody Department department) throws URISyntaxException {
+        Department savedDepartment = departmentService.save(department);
+        return ResponseEntity.created(new URI("/departments/" +
+                savedDepartment.getId())).body(savedDepartment);
     }
 
     @GetMapping("/details/{id}")
-    public String details(Model model, @PathVariable(name = "id") int id) {
+    public ResponseEntity<Department> details(@PathVariable int id) {
         Department department = departmentService.getDepartment(id);
-        model.addAttribute("department", department);
-        return "departmentsDetails";
-    }
 
-    @PostMapping("/details")
-    public String updateDepartment(@RequestParam(name = "id", defaultValue = "0") int id,
-                                   @RequestParam(name = "department") String departmentName) {
-        Department department = departmentService.getDepartment(id);
-        if (department != null && departmentName != null) {
-            department.setDepartmentName(departmentName);
-            departmentService.update(department);
+        if (department != null) {
+            return new ResponseEntity<>(department, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        return "redirect:/departments";
     }
 
-    @PostMapping(value = "/deleteDepartment")
-    public String deleteEmployee(@RequestParam(name = "id", defaultValue = "0") int id) {
+    @PostMapping("/details/{id}")
+    public ResponseEntity<Department> updateDepartment(@RequestBody Department newDepartment, @PathVariable int id) {
         Department department = departmentService.getDepartment(id);
+        if (department != null && newDepartment != null) {
+            department.setDepartmentName(newDepartment.getDepartmentName());
+            departmentService.update(department);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
 
-        //How to escape a white page with error
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Department> deleteDepartment(@PathVariable int id) {
+        Department department = departmentService.getDepartment(id);
         List<Employee> employees = employeeService.getEmployees();
+
         for (Employee employee: employees) {
             if (employee.getDepartment().getId() == id) {
-                return "redirect:/departments";
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         }
         if (department != null) {
             departmentService.delete(department);
         }
 
-        return "redirect:/departments";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

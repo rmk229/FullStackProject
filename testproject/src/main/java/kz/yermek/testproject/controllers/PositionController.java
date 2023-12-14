@@ -5,77 +5,78 @@ import kz.yermek.testproject.models.Position;
 import kz.yermek.testproject.services.EmployeeService;
 import kz.yermek.testproject.services.PositionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/positions")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class PositionController {
 
     private final EmployeeService employeeService;
     private final PositionService positionService;
 
     @GetMapping
-    public String getAllPositions(Model model) {
+    public ResponseEntity<List<Position>> getAllPositions() {
         List<Position> positions = positionService.getPositions();
-        model.addAttribute("positions", positions);
-
-        return "positions";
+        return new ResponseEntity<>(positions, HttpStatus.OK);
     }
 
     @GetMapping("/add")
-    public String getForm() {
-        return "positionsAdd";
+    public ResponseEntity<Position> getForm() {
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/add")
-    public String addPosition(@RequestParam(name = "position_name") String positionName) {
-        if (positionName != null) {
-            Position position = new Position();
-            position.setPositionName(positionName);
-            positionService.addPosition(position);
-        }
-        return "redirect:/positions";
+    public ResponseEntity<Position> createPosition(@RequestBody Position position) throws URISyntaxException {
+        Position savedPosition = positionService.save(position);
+        return ResponseEntity.created(new URI("/positions/" +
+                savedPosition.getId())).body(savedPosition);
     }
 
     @GetMapping("/details/{id}")
-    public String details(Model model, @PathVariable(name = "id") int id) {
+    public ResponseEntity<Position> details(@PathVariable int id) {
         Position position = positionService.getPosition(id);
-        model.addAttribute("position", position);
-        return "positionsDetails";
+
+        if (position != null) {
+            return new ResponseEntity<>(position, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    @PostMapping("/details")
-    public String updatePosition(@RequestParam(name = "id", defaultValue = "0") int id,
-                                 @RequestParam(name = "position") String positionName) {
+    @PostMapping("/details/{id}")
+    public ResponseEntity<Position> updatePosition(@RequestBody Position newPosition,  @PathVariable int id) {
         Position position = positionService.getPosition(id);
-        if (position != null && positionName != null) {
-            position.setPositionName(positionName);
+        if (position != null && newPosition != null) {
+            position.setPositionName(newPosition.getPositionName());
             positionService.update(position);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
 
-        return "redirect:/positions";
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping(value = "/deletePositions")
-    public String deletePosition(@RequestParam(name = "id", defaultValue = "0") int id) {
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Position> deletePosition(@PathVariable int id) {
         Position position = positionService.getPosition(id);
-
         List<Employee> employees = employeeService.getEmployees();
+
         for (Employee employee : employees) {
             if (employee.getPosition().getId() == id) {
-                return "redirect:/positions";
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         }
 
         if (position != null) {
             positionService.delete(position);
         }
-
-        return "redirect:/positions";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

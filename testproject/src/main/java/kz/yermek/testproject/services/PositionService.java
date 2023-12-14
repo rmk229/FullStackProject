@@ -11,6 +11,7 @@ public interface PositionService {
     Position addPosition(Position position);
     Position update(Position position);
     Position getPosition(int id);
+    Position save(Position position);
     void delete(Position position);
     List<Position> searchPosition(String query);
 

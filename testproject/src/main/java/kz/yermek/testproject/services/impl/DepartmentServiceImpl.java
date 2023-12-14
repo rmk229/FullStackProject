@@ -45,33 +45,12 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
+    public Department save(Department department) {
+        return departmentRepository.save(department);
+    }
+
+    @Override
     public List<Department> searchDepartment(String query) {
         return departmentRepository.findByDepartmentNameEqualsIgnoreCase(query);
     }
-
-//
-//    @Override
-//    @Transactional
-//    public void release(int id) {
-//        departmentRepository.findById(id).ifPresent(
-//                department -> {
-//                    department.setEmployees(null);
-//                }
-//        );
-//    }
-//
-//    @Override
-//    @Transactional
-//    public void assign(int id, Employee selectedEmployee) {
-//        departmentRepository.findById(id).ifPresent(
-//                department -> {
-//                    department.setEmployees(Collections.singletonList(selectedEmployee));
-//                }
-//        );
-//    }
-//
-//    @Override
-//    public Employee getEmployeesDepartment(int id) {
-//        return (Employee) departmentRepository.findById(id).map(Department::getEmployees).orElse(null);
-//    }
 }
